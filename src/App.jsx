@@ -1,8 +1,8 @@
+// src/App.jsx
 import React, { useState } from 'react';
-import { Upload, Download, FileText, AlertCircle, CheckCircle, Settings, ClipboardList } from 'lucide-react';
+import { Upload, Download, FileText, AlertCircle, CheckCircle, Settings, ClipboardList, FileDown } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
-// These are the original generator imports, which are correct for your request.
 import { generateDocxReport } from './utils/docx-generator';
 import { generateExcelReport } from './utils/excel-generator';
 import { generatePdfReport } from './utils/pdf-generator';
@@ -213,6 +213,26 @@ const CaseTransferReportApp = () => {
     setShowReportPreview(true);
   };
 
+  // --- UPDATED FUNCTION: Download Sample Template with exact data requested ---
+  const handleDownloadTemplate = () => {
+    const templateData = [
+      ['CASE NO', 'FROM COURT', 'TO COURT', 'NATURE', 'SIDE'],
+      ['RCS/123/2023', 'MSD', '3SD', 'OTHER', 'Civil'],
+      ['CC/456/2024', '2SD', '2JD', 'IPC', 'Criminal'],
+      ['SC/789/2022', 'PDJ', 'ADJ', 'IPC', 'Criminal']
+    ];
+
+    const ws = XLSX.utils.aoa_to_sheet(templateData);
+
+    // Auto-size columns to look neat
+    ws['!cols'] = [{ wch: 18 }, { wch: 15 }, { wch: 15 }, { wch: 15 }, { wch: 15 }];
+
+    const wb = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(wb, ws, 'Sample Data');
+    XLSX.writeFile(wb, 'Case_Report_Template.xlsx');
+  };
+  // --------------------------------------------------------------------------
+
   const canGenerate = data.length > 0 && columnMapping.caseNo &&
     ((columnMapping.fromCourt && columnMapping.toCourt) || columnMapping.nature || columnMapping.side);
 
@@ -251,6 +271,14 @@ const CaseTransferReportApp = () => {
                   <input type="file" accept=".xlsx,.xls" onChange={handleFileUpload} className="d-none" />
                 </div>
               </label>
+              <div className="text-end mt-2">
+                <button
+                  onClick={handleDownloadTemplate}
+                  className="btn btn-sm btn-link text-decoration-none d-inline-flex align-items-center gap-1"
+                >
+                  <FileDown size={18} /> Need a template? Download Sample Excel
+                </button>
+              </div>
             </div>
             {data.length > 0 && (
               <div className="mb-4">
